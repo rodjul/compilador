@@ -325,7 +325,10 @@ int main(){
 						numero[n++] = c;
 					
 					//se for encontrado alguma letra em conjunto com o numero, nao eh reconhecido
-					if( !(isdigit(c)) && !(isPontuacao(c)) ){
+					//c!=32 - se nao for espaco em branco
+					//c!='\0' - se nao for fim da linha que nao possui caracteres
+					//c!=EOF - se nao for fim do arquivo
+					if( c!=32 && c!='\0' && c!=EOF && !(isdigit(c)) && !(isPontuacao(c)) ){
 						//[a-z]+([a-z0-9]*)
 						//coloca na string buffer os numeros
 						string_buffer = numero;
