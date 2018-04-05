@@ -6,7 +6,6 @@
 char file_saida[21] = "analisador_lexico.txt";
 char file_entrada[21] = "entrada.txt";
 
-//falta mod, senao, logico, validar expressões?
 
 struct TOKEN{
 	char *token;
@@ -121,11 +120,11 @@ int main(){
 						limpaBuffer(string_buffer,len_string_buffer);
 						c = buffer[++index]; //forward
 						if(c == 32)
-							while( (c = buffer[++index]) == ' ' ); //pula espaço
+							while( (c = buffer[++index]) == ' ' ); //pula espaÃ§o
 						if(c < 0 || c == '\0') //condicao de parada se nao encontrar mais caracteres validos
 							break;
 					}else if(c==32){ //se entrou nessa condicao, a linha possui indentacao
-						while( (c = buffer[++index]) == ' ' ); //pula espaço
+						while( (c = buffer[++index]) == ' ' ); //pula espaÃ§o
 					}
 						
 					//lexemaBegin recebe o INDEX que ta sendo iniciado a verificacao da string
@@ -145,6 +144,7 @@ int main(){
 					}
 					else if(c == 'l') state=94; //leia
 					else if(c == 'i') state=32; //inicio
+					else if(c == 'm') state=108; //mod
 					else if(c == 'p') state=143; //para
 					else if(c == 's') state=45; //se
 					else if(c == 'v') state = 29; //var
@@ -180,7 +180,7 @@ int main(){
 					}else if(c == ':') state=140;
 					else if(c == ';') state=141;
 					else if(c == ',') state=142;
-					//se chegou aqui, é uma variavel
+					//se chegou aqui, Ã© uma variavel
 					else state=1;
 					 
 					break;
@@ -261,7 +261,7 @@ int main(){
 					break;
 				case 10:
 					c = buffer[++index];
-					if(c != ' ' ) state = 1; //se tiver mais alguma letra, é variavel
+					if(c != ' ' ) state = 1; //se tiver mais alguma letra, Ã© variavel
 					else{
 						index--;//rollback
 						token->attribute = "PRIV";
@@ -317,16 +317,33 @@ int main(){
 					break;
 				
 				//numeros
-				case 12: ; //https://stackoverflow.com/questions/18496282/why-do-i-get-a-label-can-only-be-part-of-a-statement-and-a-declaration-is-not-a
+				case 12: ;//https://stackoverflow.com/questions/18496282/why-do-i-get-a-label-can-only-be-part-of-a-statement-and-a-declaration-is-not-a
 					char *numero = (char*) calloc(10,sizeof(char)); 
 					int n=0;
 					numero[n++] = c;
-					while( isdigit( (c = buffer[++index]) ) ){
-						//if(c == '0' | c == '1' | c == '2' | c == '3' | c == '4' | c == '5' | c == '6' | c == '7' | c == '8' | c == '9' )
+					while( isdigit( (c = buffer[++index]) ) )
 						numero[n++] = c;
+					
+					//se for encontrado alguma letra em conjunto com o numero, nao eh reconhecido
+					if( !(isdigit(c)) && !(isPontuacao(c)) ){
+						//[a-z]+([a-z0-9]*)
+						//coloca na string buffer os numeros
+						string_buffer = numero;
+						while(c!=32){
+							c=buffer[++index];
+							if(isPontuacao(c))
+								break;
+							string_buffer[n++] = c;
+						}
+						token->token = "ERRO LEXICO";
+						token->attribute = string_buffer;
+						
+					}else{
+						token->token = "numero";
+						token->attribute = numero;
 					}
-					token->token = "numero";
-					token->attribute = numero;
+					
+
 					state = 0;
 					index--;
 					break;
@@ -344,7 +361,7 @@ int main(){
 					break;
 				case 31:
 					c = buffer[++index];
-					if(c == 32){ //espaço/vazio
+					if(c == 32){ //espaÃ§o/vazio
 						token->token = "var";
 						token->attribute = "PRIV";
 						index--;
@@ -669,9 +686,29 @@ int main(){
 						token->attribute = "PRIV";
 						index--;
 						state=0;
+					}else if(c == 'n') state=73;
+					else state=1;
+					break;
+				//senao
+				case 73:
+					c = buffer[++index];
+					if(c=='a') state=74;
+					else state=1;
+					break;
+				case 74:
+					c = buffer[++index];
+					if(c=='o') state=75;
+					else state=1;
+					break;
+				case 75:
+					c = buffer[++index];
+					if(c==32 || c==' '){
+						token->token = "senao";
+						token->attribute = "PRIV";
+						index--;
+						state=0;
 					}else state=1;
 					break;
-				
 				
 				//relop 	
 				case 52: //<
@@ -870,6 +907,7 @@ int main(){
 				case 94: //leia
 					c = buffer[++index];
 					if(c == 'e') state=95;
+					else if(c=='o') state=23;//logico
 					else state=1;
 					break;
 				case 95:
@@ -891,7 +929,57 @@ int main(){
 						state=0;
 					}else state=1;
 					break;
+				//logico
+				case 23:
+					c = buffer[++index];
+					if(c=='g') state=24;
+					else state=1;
+					break;
+				case 24:
+					c = buffer[++index];
+					if(c=='i') state=25;
+					else state=1;
+					break;
+				case 25:
+					c = buffer[++index];
+					if(c=='c') state=26;
+					else state=1;
+					break;
+				case 26:
+					c = buffer[++index];
+					if(c=='o') state=27;
+					else state=1;
+					break;
+				case 27:
+					c = buffer[++index];
+					if(c==32 || c==' '){
+						token->token = "logico";
+						token->attribute = "PRIV";
+						index--;
+						state=0;
+					}else state=1;
+					break;
 					
+				//mod
+				case 108:
+					c = buffer[++index];
+					if(c=='o') state=109;
+					else state=1;
+					break;
+				case 109:
+					c = buffer[++index];
+					if(c=='d') state=110;
+					else state=1;
+					break;
+				case 110:
+					c = buffer[++index];
+					if(c =='(' || c==')' || c!=' ' || c == 32){
+						token->token = "funcaoio";
+						token->attribute = "mod";
+						index--;
+						state=0;
+					}else state=1;
+					break;
 				
 				//SOMA
 				case 68:
@@ -962,7 +1050,7 @@ int main(){
 			}
 		}
 		
-		free(string_buffer);
+		//free(string_buffer);
 		
 	}
 
