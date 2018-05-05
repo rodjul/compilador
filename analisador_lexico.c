@@ -1,9 +1,15 @@
+/*Leonardo Toniolo
+Julio Brazil
+Raphael Bertachine
+Rodrigo Juliano M
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
-char file_saida[21] = "analisador_lexico.txt";
+char file_saida[21] = "output.txt";
 char file_entrada[21] = "entrada.txt";
 
 
@@ -85,6 +91,8 @@ int main(){
 		//coloca em um buffer a linha atual da entrada
 		while( (c = fgetc(fp)) != '\n' && c != EOF) 
 			buffer[i++] = c;
+		
+			
 		//se nao leu linha, verifica se ha linhas em brancos e le novamente
 		if(i == 0){
 			while((c = fgetc(fp)) == '\n');
@@ -112,6 +120,9 @@ int main(){
 			switch(state){
 				case 0:
 					c = buffer[index];
+					
+					while(c < 0) 
+						c = buffer[++index];
 					//verifica se o token nao eh NULL para poder imprimir a saida
 					if(strcmp(token->attribute,"") != 0){
 						writeTokenFile(token);
@@ -132,22 +143,22 @@ int main(){
 					
 					if(c == 'a') state=2; //algoritmo
 					else if(c == '0' | c == '1' | c == '2' | c == '3' | c == '4' | c == '5' | c == '6' | c == '7' | c == '8' | c == '9') state = 12;
-					else if(c == 'd') state= 147; //de
-					else if(c == 'e') state = 106; //E, entao, enquanto, exp, escreva
-					else if(c == 'f'){
+					else if(c == 'd' || c == 'D') state= 147; //de
+					else if(c == 'e' || c == 'E') state = 106; //E, entao, enquanto, exp, escreva
+					else if(c == 'f' || c == 'F'){
 						c = buffer[++index];
-						if(c=='a') state=83; //faca 
+						if(c=='a' || c=='A') state=83; //faca 
 						else{ 
 							c = buffer[--index];
 							state=55; //fimpara fimse fimalgoritmo fimenquanto
 						}
 					}
-					else if(c == 'l') state=94; //leia
-					else if(c == 'i') state=32; //inicio
-					else if(c == 'm') state=108; //mod
-					else if(c == 'p') state=143; //para
-					else if(c == 's') state=45; //se
-					else if(c == 'v') state = 29; //var
+					else if(c == 'l' || c == 'L') state=94; //leia
+					else if(c == 'i' || c == 'I') state=32; //inicio
+					else if(c == 'm' || c == 'M') state=108; //mod
+					else if(c == 'p' || c == 'P') state=143; //para
+					else if(c == 's' || c == 'S') state=45; //se
+					else if(c == 'v' || c == 'V') state = 29; //var
 					//relop	
 					else if(c == '<') state=52;
 					else if(c == '>') state=54;
@@ -220,43 +231,43 @@ int main(){
 				//algoritmo 
 				case 2:
 					c = buffer[++index];
-					if(c == 'l') state = 3;
-					else if( c =='t') state = 80; //ate 79-81
+					if(c == 'l' || c == 'L') state = 3;
+					else if( c =='t' || c =='T') state = 80; //ate 79-81
 					else state = 1; //string
 					break;
 				case 3:
 					c = buffer[++index];
-					if(c == 'g') state = 4;
+					if(c == 'g' || c == 'G') state = 4;
 					else state = 1; //variavel
 					break;
 				case 4:
 					c = buffer[++index];
-					if(c == 'o') state = 5;
+					if(c == 'o' || c == 'O') state = 5;
 					else state = 1; //variavel
 					break;
 				case 5:
 					c = buffer[++index];
-					if(c == 'r') state = 6;
+					if(c == 'r' || c == 'R') state = 6;
 					else state = 1; //variavel
 					break;
 				case 6:
 					c = buffer[++index];
-					if(c == 'i') state = 7;
+					if(c == 'i' || c == 'I') state = 7;
 					else state = 1; //variavel
 					break;
 				case 7:
 					c = buffer[++index];
-				 	if(c == 't') state = 8;
+				 	if(c == 't' || c == 'T') state = 8;
 				 	else state = 1; //variavel
 					break;
 				case 8:
 					c = buffer[++index];
-					if(c == 'm') state = 9;
+					if(c == 'm' || c == 'M') state = 9;
 					else state = 1; //variavel
 					break;
 				case 9:
 					c = buffer[++index];
-					if(c == 'o') state = 10;
+					if(c == 'o' || c == 'O') state = 10;
 					else state = 1; //variavel
 					break;
 				case 10:
@@ -272,7 +283,7 @@ int main(){
 				//ate
 				case 80:
 					c = buffer[++index];
-					if(c == 'e') state=81;
+					if(c == 'e' || c == 'E') state=81;
 					else state=1;
 					break;
 				case 81:
@@ -354,17 +365,17 @@ int main(){
 				//var
 				case 29:
 					c = buffer[++index];
-					if(c == 'a') state = 30;
+					if(c == 'a' || c == 'A') state = 30;
 					else state = 1;
 					break;
 				case 30:
 					c = buffer[++index];
-					if(c == 'r') state=31;
+					if(c == 'r' || c == 'R') state=31;
 					else state = 1;
 					break;
 				case 31:
 					c = buffer[++index];
-					if(c == 32){ //espaço/vazio
+					if(c == 32  || c== '\0'){ //espaço/vazio
 						token->token = "var";
 						token->attribute = "PRIV";
 						index--;
@@ -374,33 +385,33 @@ int main(){
 				//inicio
 				case 32:
 					c = buffer[++index];
-					if(c == 'n') state=33;
+					if(c == 'n' || c == 'N') state=33;
 					else state=1;
 					break;
 				case 33:
 					c = buffer[++index];
-					if(c=='i') state=34;
+					if(c=='i' || c=='I') state=34;
 					else if(c == 't') state=17; //inteiro
 					else state=1;
 					break;
 				case 34:
 					c = buffer[++index];
-					if(c=='c') state=35;
+					if(c=='c' || c=='C') state=35;
 					else state=1;
 					break;
 				case 35:
 					c = buffer[++index];
-					if(c=='i') state=36;
+					if(c=='i' || c=='I') state=36;
 					else state=1;
 					break;
 				case 36:
 					c = buffer[++index];
-					if(c=='o') state=37;
+					if(c=='o' || c=='O') state=37;
 					else state=1;
 					break;
 				case 37:
 					c = buffer[++index];
-					if(c==32 || c == ' '){
+					if(c==32 || c == ' ' || c == '\0'){
 						token->token = "inicio";
 						token->attribute = "PRIV";
 						index--;
@@ -410,27 +421,27 @@ int main(){
 				//inteiro
 				case 17:
 					c = buffer[++index];
-					if(c=='e') state=18;
+					if(c=='e' || c=='E') state=18;
 					else state=1;
 					break;
 				case 18:
 					c = buffer[++index];
-					if(c=='i') state=19;
+					if(c=='i' || c=='I') state=19;
 					else state=1;
 					break;
 				case 19:
 					c = buffer[++index];
-					if(c=='r') state=20;
+					if(c=='r' || c=='R') state=20;
 					else state=1;
 					break;
 				case 20:
 					c = buffer[++index];
-					if(c=='o') state=21;
+					if(c=='o' || c=='O') state=21;
 					else state=1;
 					break;
 				case 21:
 					c = buffer[++index];
-					if(c==32 || c == ' '){
+					if(c==32 || c == ' ' || c == '\0'){
 						token->token = "inteiro";
 						token->attribute = "PRIV";
 						index--;
@@ -442,17 +453,17 @@ int main(){
 				//fimpara faca fimse fimalgoritmo fimenquanto
 				case 83://faca
 					c = buffer[++index];
-					if(c=='c') state=84;
+					if(c=='c' || c=='C') state=84;
 					else state=1;
 					break;
 				case 84:
 					c = buffer[++index];
-					if(c=='a') state=85;
+					if(c=='a' || c=='A') state=85;
 					else state=1;
 					break;
 				case 85:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c == '\0'){
 						token->token = "faca";
 						token->attribute = "PRIV";
 						index--;
@@ -462,39 +473,39 @@ int main(){
 				
 				case 55://fim
 					c = buffer[++index];
-					if(c == 'i') state=56;
+					if(c == 'i' || c=='I') state=56;
 					else state=1;
 					break;
 				case 56:
 					c = buffer[++index];
-					if(c == 'm') state=57;
+					if(c == 'm' || c=='M') state=57;
 					else state=1;
 					break;
 				case 57:
 					c = buffer[++index];
-					if(c == 'p'){
+					if(c == 'p' || c=='P'){
 						 state=41; //fimpara 
 					}
-					else if(c == 'a'){
+					else if(c == 'a' || c=='A'){
 						state=58;//fimalgoritmo
 					}
-					else if(c == 's') state=118;//fimse
-					else if(c == 'e') state=123;//fimenquanto
+					else if(c == 's' || c=='S') state=118;//fimse
+					else if(c == 'e' || c=='E') state=123;//fimenquanto
 					else state=1;
 					break;
 				case 41: //fimpara
 					c = buffer[++index];
-					if(c=='a') state=42;
+					if(c=='a' || c=='A') state=42;
 					else state=1;
 					break;
 				case 42:
 					c = buffer[++index];
-					if(c=='r') state=43;
+					if(c=='r' || c=='R') state=43;
 					else state=1;
 					break;
 				case 43:
 					c = buffer[++index];
-					if(c=='a') state=44;
+					if(c=='a' || c=='A') state=44;
 					else state=1;
 					break;
 				case 44:
@@ -508,42 +519,42 @@ int main(){
 					break;
 				case 58: //fimalgoritmo
 					c = buffer[++index];
-					if(c=='l') state=59;
+					if(c=='l' || c=='L') state=59;
 					else state=1;
 					break;
 				case 59:
 					c = buffer[++index];
-					if(c=='g') state=60;
+					if(c=='g' || c=='G') state=60;
 					else state=1;
 					break;
 				case 60:
 					c = buffer[++index];
-					if(c=='o') state=61;
+					if(c=='o' || c=='O') state=61;
 					else state=1;
 					break;
 				case 61:
 					c = buffer[++index];
-					if(c=='r') state=62;
+					if(c=='r' || c=='R') state=62;
 					else state=1;
 					break;
 				case 62:
 					c = buffer[++index];
-					if(c=='i') state=63;
+					if(c=='i' || c=='I') state=63;
 					else state=1;
 					break;
 				case 63:
 					c = buffer[++index];
-					if(c=='t') state=64;
+					if(c=='t' || c=='T') state=64;
 					else state=1;
 					break;
 				case 64:
 					c = buffer[++index];
-					if(c=='m') state=65;
+					if(c=='m' || c=='M') state=65;
 					else state=1;
 					break;
 				case 65:
 					c = buffer[++index];
-					if(c=='o') state=66;
+					if(c=='o' || c=='O') state=66;
 					else state=1;
 					break;
 				case 66:
@@ -557,12 +568,12 @@ int main(){
 					break;
 				case 118: //fimse
 					c = buffer[++index];
-					if(c=='e') state=119;
+					if(c=='e' || c=='E') state=119;
 					else state=1;
 					break;
 				case 119:
 					c = buffer[++index];
-					if(c != ' '){
+					if(c==32 || c != ' ' || c=='\0'){
 						token->token = "fimse";
 						token->attribute = "PRIV";
 						index--;
@@ -571,42 +582,42 @@ int main(){
 					break;
 				case 123: //fimenquanto
 					c = buffer[++index];
-					if(c=='n') state=124;
+					if(c=='n' || c=='N') state=124;
 					else state=1;
 					break;
 				case 124:
 					c = buffer[++index];
-					if(c=='q') state=125;
+					if(c=='q' || c=='Q') state=125;
 					else state=1;
 					break;
 				case 125:
 					c = buffer[++index];
-					if(c=='u') state=126;
+					if(c=='u' || c=='U') state=126;
 					else state=1;
 					break;
 				case 127:
 					c = buffer[++index];
-					if(c=='a') state=128;
+					if(c=='a' || c=='A') state=128;
 					else state=1;
 					break;
 				case 128:
 					c = buffer[++index];
-					if(c=='n') state=129;
+					if(c=='n' || c=='N') state=129;
 					else state=1;
 					break;
 				case 129:
 					c = buffer[++index];
-					if(c=='t') state=130;
+					if(c=='t' || c=='T') state=130;
 					else state=1;
 					break;
 				case 130:
 					c = buffer[++index];
-					if(c=='o') state=131;
+					if(c=='o' || c=='O') state=131;
 					else state=1;
 					break;
 				case 131:
 					c = buffer[++index];
-					if(c!=' '){
+					if(c==32 || c != ' ' || c=='\0'){
 						token->token = "fimenquanto";
 						token->attribute = "PRIV";
 						index--;
@@ -617,23 +628,23 @@ int main(){
 				//para //passo
 				case 143:
 					c = buffer[++index];
-					if(c=='a') state=144;
+					if(c=='a' || c=='A') state=144;
 					else state=1;
 					break;
 				case 144:
 					c = buffer[++index];
-					if(c=='r') state=145;
+					if(c=='r' || c=='R') state=145;
 					else if(c=='s') state=149;
 					else state=1;
 					break;
 				case 145:
 					c = buffer[++index];
-					if(c=='a') state=146;
+					if(c=='a' || c=='A') state=146;
 					else state=1;
 					break;
 				case 146:
 					c = buffer[++index];
-					if(c == 32 || c == ' '){
+					if(c == 32 || c == ' ' || c=='\0'){
 						token->token = "para";
 						token->attribute = "PRIV";
 						index--;
@@ -642,17 +653,17 @@ int main(){
 					break;
 				case 149: //passo
 					c = buffer[++index];
-					if(c=='s') state=150;
+					if(c=='s' || c=='S') state=150;
 					else state=1;
 					break;
 				case 150:
 					c = buffer[++index];
-					if(c=='o') state=151;
+					if(c=='o' || c=='O') state=151;
 					else state=1;
 					break;
 				case 151:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "passo";
 						token->attribute = "PRIV";
 						index--;
@@ -663,12 +674,12 @@ int main(){
 				//de
 				case 147:
 					c = buffer[++index];
-					if(c=='e') state=148;
+					if(c=='e' || c=='E') state=148;
 					else state=1;
 					break;
 				case 148:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "de";
 						token->attribute = "PRIV";
 						index--;
@@ -679,12 +690,12 @@ int main(){
 				//se
 				case 45:
 					c = buffer[++index];
-					if(c == 'e') state=46;
+					if(c == 'e' || c=='E') state=46;
 					else state=1;
 					break;
 				case 46:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "se";
 						token->attribute = "PRIV";
 						index--;
@@ -695,17 +706,17 @@ int main(){
 				//senao
 				case 73:
 					c = buffer[++index];
-					if(c=='a') state=74;
+					if(c=='a' || c=='A') state=74;
 					else state=1;
 					break;
 				case 74:
 					c = buffer[++index];
-					if(c=='o') state=75;
+					if(c=='o' || c=='O') state=75;
 					else state=1;
 					break;
 				case 75:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "senao";
 						token->attribute = "PRIV";
 						index--;
@@ -727,8 +738,8 @@ int main(){
 					} 
 					break;
 				case 132: //<- atribuicao
-					token->token = "comando";
-					token->attribute = "atribuicao";
+					token->token = "cmdatribuicao";
+					token->attribute = "<-";
 					state=0;
 					break;
 					
@@ -761,12 +772,12 @@ int main(){
 					break;
 				case 107: //ou
 					c = buffer[++index];
-					if(c == 'u') state = 38;
+					if(c == 'u' || c=='U') state = 38;
 					else state=1;
 					break;
 				case 38:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "relop";
 						token->attribute = "OU";
 						index--;
@@ -777,31 +788,31 @@ int main(){
 				//verificando E, entao, enquanto, exp, escreva
 				case 106: //e no AF, os estados sao 86,99,111,47, removendo esses valores
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "relop";
 						token->attribute = "E";
 						index--;
 						state=0;
 					}
-					else if(c == 'n') state=48; //entao 47 e 86
-					else if(c == 's') state=100; //escreva 99
-					else if(c == 'x') state=112; //exp 111
+					else if(c == 'n' || c=='N') state=48; //entao 47 e 86
+					else if(c == 's' || c=='S') state=100; //escreva 99
+					else if(c == 'x' || c=='X') state=112; //exp 111
 					else state=1;
 					break;
 				case 48: //n - entao || enquanto
 					c = buffer[++index];
-					if(c == 't') state=49;
-					else if(c == 'q') state=88;
+					if(c == 't' || c=='T') state=49;
+					else if(c == 'q' || c=='Q') state=88;
 					else state=1;
 					break;
 				case 49: //entao
 					c = buffer[++index];
-					if(c == 'a') state=50;
+					if(c == 'a' || c=='A') state=50;
 					else state=1;
 					break;
 				case 50: //entao
 					c = buffer[++index];
-					if(c == 'o') state=51;
+					if(c == 'o' || c=='O') state=51;
 					else state=1;
 					break;
 				case 51: //entao
@@ -815,32 +826,32 @@ int main(){
 					break;
 				case 88: //enquanto
 					c = buffer[++index];
-					if(c == 'u') state=89;
+					if(c == 'u' || c=='U') state=89;
 					else state=1;
 					break;
 				case 89: //enquanto
 					c = buffer[++index];
-					if(c == 'a') state=90;
+					if(c == 'a' || c=='A') state=90;
 					else state=1;
 					break;
 				case 90: //enquanto
 					c = buffer[++index];
-					if(c == 'n') state=91;
+					if(c == 'n' || c=='N') state=91;
 					else state=1;
 					break;
 				case 91: //enquanto
 					c = buffer[++index];
-					if(c == 't') state=92;
+					if(c == 't' || c=='T') state=92;
 					else state=1;
 					break;
 				case 92: //enquanto
 					c = buffer[++index];
-					if(c == 'o') state=93;
+					if(c == 'o' || c=='O') state=93;
 					else state=1;
 					break;
 				case 93: //enquanto
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "enquanto";
 						token->attribute = "PRIV";
 						index--;
@@ -849,27 +860,27 @@ int main(){
 					break;
 				case 100: //escreva
 					c = buffer[++index];
-					if(c == 'c') state=101;
+					if(c == 'c' || c=='C') state=101;
 					else state=1;
 					break;
 				case 101:
 					c = buffer[++index];
-					if(c == 'r') state=102;
+					if(c == 'r' || c=='R') state=102;
 					else state=1;
 					break;
 				case 102:
 					c = buffer[++index];
-					if(c == 'e') state=103;
+					if(c == 'e' || c=='E') state=103;
 					else state=1;
 					break;
 				case 103:
 					c = buffer[++index];
-					if(c == 'v') state=104;
+					if(c == 'v' || c=='V') state=104;
 					else state=1;
 					break;
 				case 104:
 					c = buffer[++index];
-					if(c == 'a') state=105;
+					if(c == 'a' || c=='A') state=105;
 					else state=1;
 					break;
 				case 105: //escreva
@@ -894,12 +905,12 @@ int main(){
 					
 				case 112: //exp
 					c = buffer[++index];
-					if(c == 'p') state=113;
+					if(c == 'p' || c=='P') state=113;
 					else state=1;
 					break;
 				case 113:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "relop";
 						token->attribute = "exp";
 						index--;
@@ -909,18 +920,18 @@ int main(){
 				
 				case 94: //leia
 					c = buffer[++index];
-					if(c == 'e') state=95;
+					if(c == 'e' || c=='E') state=95;
 					else if(c=='o') state=23;//logico
 					else state=1;
 					break;
 				case 95:
 					c = buffer[++index];
-					if(c=='i') state=96;
+					if(c=='i' || c=='I') state=96;
 					else state=1;
 					break;
 				case 96:
 					c = buffer[++index];
-					if(c=='a') state=97;
+					if(c=='a' || c=='A') state=97;
 					else state=1;
 					break;
 				case 97:
@@ -935,27 +946,27 @@ int main(){
 				//logico
 				case 23:
 					c = buffer[++index];
-					if(c=='g') state=24;
+					if(c=='g' || c=='G') state=24;
 					else state=1;
 					break;
 				case 24:
 					c = buffer[++index];
-					if(c=='i') state=25;
+					if(c=='i' || c=='I') state=25;
 					else state=1;
 					break;
 				case 25:
 					c = buffer[++index];
-					if(c=='c') state=26;
+					if(c=='c' || c=='C') state=26;
 					else state=1;
 					break;
 				case 26:
 					c = buffer[++index];
-					if(c=='o') state=27;
+					if(c=='o' || c=='O') state=27;
 					else state=1;
 					break;
 				case 27:
 					c = buffer[++index];
-					if(c==32 || c==' '){
+					if(c==32 || c==' ' || c=='\0'){
 						token->token = "logico";
 						token->attribute = "PRIV";
 						index--;
@@ -966,12 +977,12 @@ int main(){
 				//mod
 				case 108:
 					c = buffer[++index];
-					if(c=='o') state=109;
+					if(c=='o' || c=='O') state=109;
 					else state=1;
 					break;
 				case 109:
 					c = buffer[++index];
-					if(c=='d') state=110;
+					if(c=='d' || c=='D') state=110;
 					else state=1;
 					break;
 				case 110:
