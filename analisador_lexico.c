@@ -9,8 +9,8 @@ Rodrigo Juliano M
 #include <string.h>
 
 
-char file_saida[21] = "output.txt";
-char file_entrada[21] = "entrada.txt";
+char file_saida[21] = "saida_pro.txt";
+char file_entrada[21] = "teste_pro.txt";
 
 
 struct TOKEN{
@@ -173,8 +173,8 @@ int main(){
 							state = 71;
 						}
 						else{
-							token->token = "operacao";
-							token->attribute = "div";
+							token->token = "operador";
+							token->attribute = "DIV";
 							state = 71;
 						}
 					}
@@ -911,7 +911,7 @@ int main(){
 				case 113:
 					c = buffer[++index];
 					if(c==32 || c==' ' || c=='\0'){
-						token->token = "relop";
+						token->token = "funcaoio";
 						token->attribute = "exp";
 						index--;
 						state=0;
