@@ -9,8 +9,8 @@ Rodrigo Juliano M
 #include <string.h>
 
 
-char file_saida[21] = "saida_pro.txt";
-char file_entrada[21] = "teste_pro.txt";
+char file_saida[21] = "sintatico_entrada.txt";
+char file_entrada[21] = "entrada.txt";
 
 
 struct TOKEN{
