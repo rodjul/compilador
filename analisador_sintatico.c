@@ -101,6 +101,7 @@ void startParser(struct arrayString *buffer){
 	
 	//starts with algoritmo
 	if( isReservada(buffer[position].string, "algoritmo")){
+		notAlgoritmo:
 		if(isVariable(buffer[position].string) ){
 			verifyAgain:
 			verificaSecaoDeclaracao(buffer);
@@ -112,10 +113,10 @@ void startParser(struct arrayString *buffer){
 		}
 		
 	}else{
-		writeTokenFile(buffer[position].string,1,"MOTIVO: falta algoritmo");
+		//writeTokenFile(buffer[position].string,1,"MOTIVO: falta algoritmo");
 
 		errosSintaticos++;
-		goto verifyAgain;
+		goto notAlgoritmo;
 	}
 	
 }
@@ -160,7 +161,7 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 		if( strcmp( buffer[position].string , "inicio") != 0 && startWithVar ) {
 			int isVir,isPontuacaoVerified;
 		
-		//notStartedWithVar é chamado quando a secao de declaracao nao é inicializado primeiro com VAR
+		//notStartedWithVar Ã© chamado quando a secao de declaracao nao Ã© inicializado primeiro com VAR
 		notStartedWithVar:	
 		
 			isVir =0; isPontuacaoVerified=0;
@@ -189,6 +190,12 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 							errosSintaticos++; 
 						}
 						
+					}
+					else if(strcmp(buffer[position].string,"cmdatribuicao,-") == 0){
+						//writeTokenFile(buffer[position].string,1,"MOTIVO: falta inicio");
+						//errosSintaticos++;
+						position--;
+						return;
 					}
 					else if(!isVir){ //se n encontrou vir e :, erro sintatico
 						writeTokenFile(buffer[position].string,1,"MOTIVO: falta virgula ou dois pontos");
@@ -245,6 +252,10 @@ int verificaSecaoComandos(struct arrayString *buffer, int mode){
 				
 	}else if (mode ==1){
 		loop:
+		if(lines == position){
+			position--;
+			return 1;
+		}
 		if( strcmp( buffer[position].string, "se" ) == 0){
 			sintaxeSe(buffer);
 		}else if( strcmp( buffer[position].string, "para" ) == 0 ){
@@ -281,7 +292,7 @@ int verificaSecaoComandos(struct arrayString *buffer, int mode){
 					return 1;
 		}else{
 			errosSintaticos++;
-			writeTokenFile(buffer[position].string,1,"MOTIVO: caracter desconhecida");
+			writeTokenFile(buffer[position].string,1,"MOTIVO: caracter desconhecido");
 			position++;
 		}
 		
@@ -308,6 +319,13 @@ int verificaExpLogica(struct arrayString *buffer){
 			//else{
 				//printf("ERRO LEXICO %s\n", buffer[position].string);
 			//}
+		}else if(strcmp(buffer[position].string,"entao") == 0){
+			return boolean;
+		}
+		else{
+			writeTokenFile(buffer[position].string,1,"MOTIVO: falta variavel em ExpLOgica");
+			errosSintaticos++;
+			goto loop;
 		}
 	}
 	if(!boolean){
