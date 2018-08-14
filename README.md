@@ -1,86 +1,101 @@
-(PTBR) - Projeto de compilador feito em C.
-Estrutura: 
-- analisador_lexico.c -> recebe como entrada um arquivo txt contendo a linguagem requerida (Visualg PT) e gera um arquivo de saida contendo as estruturas token e atributos.
-- analisador_semantico.c -> le o arquivo que geour de saida e analisa se as estruturas da linguagem e declaração semânticas estão corretas.
+### (PTBR) - Projeto de compilador feito em C.<br>
+Estrutura: <br>
+- analisador_lexico.c -&gt; recebe como entrada um arquivo txt contendo a linguagem requerida (Visualg PT) e gera um arquivo de saida contendo as estruturas token e atributos.
+- analisador_semantico.c -&gt; le o arquivo que geour de saida e analisa se as estruturas da linguagem e declara&ccedil;&atilde;o sem&acirc;nticas est&atilde;o corretas.
 
-(EN) - Compiler Project made in C.
-Structure:
+### (EN) - Compiler Project made in C.<br>
+Structure:<br>
 - analisador_lexico.c (lexic analysis) - read input txt file that contains the language requirement (Visualg PT) and do an output with the meanings of tokens and attributes.
 - analisador_semantico.c (semantic analysis) - read the output file before and read to verify if the structures and variable declarations are correct.
 
 
-<b>Language requirement<b>
-Below are the structures that contains on the code.
-  
-LEXIC SPECIFICATION
-▪ Type:
-inteiro: intenger that not contains float numbers. Example: 0,1,2,3,4..
-logico: boolean value TRUE or FALSE.
-▪ Declaration of variables
-<array-of-vars> : <type>
-In <array-of-vars>, the vars are separated by comas (,).
+### Language requirement <br>
+Below are the structures that contains on the code.<br>
 
 
-▪ Operations
-+ - * \ mod 
-> >= < <= exp 
-= <> e ou
+#### LEXIC SPECIFICATION<br>
 
-▪ IO
-leia (<array-of-vars>)
-escreva (<array-of-vars>)
-
-▪ IF structure
-se <expressão-lógica> entao
-<sequência-de-comandos>
-senao
-<sequência-de-comandos>
-fimse
-
-▪ LOOP strucutre
-para <variável> de <valor-inicial> ate <valor-limite> [passo <incremento>] faca
-<sequência-de-comandos>
-fimpara
-
-enquanto <expressão-lógica> faca
-<sequência-de-comandos>
-fimenquanto
-
-▪ Attribution
-variável <- valor
-variável <- variável
-variável <- expressão
-
-▪ Basic structure that requires to follow to works
-algoritmo "semnome"
-// Função :
-// Autor :
-// Data :
-// Seção de Declarações
-inicio
-// Seção de Comandos
-fimalgoritmo
+Type:<br>
+inteiro: intenger that not contains float numbers. Example: 0,1,2,3,4..<br>
+logico: boolean value TRUE or FALSE.<br>
 
 
+Declaration of variables<br>
+&lt;array-of-vars&gt; : &lt;type&gt; <br>
+In &lt;array-of-vars&gt;, the vars are separated by comas (,). <br>
 
-<code>
-algoritmo "salario"
-// Seção de Declarações
-var sal:inteiro
-i,contador:inteiro
 
-inicio
-// Seção de Comando
-i<-0;
-contador<-0;
-para i de 1 ate 5 passo 1 faca
-   escreva("Digite o salario do funcionário ",i, ": ")
-   leia (sal)
-   se sal>500 entao
-      contador<-contador+1
-   fimse
-fimpara
-escreval(contador, " Funcionários recebem salários superiores a R$ 300" )
-fimalgoritmo  
-  
-</code>
+### Operations<br>
+```
++ - * \ mod  <br>
+&gt; &gt;= &lt; &lt;= exp  <br>
+= &lt;&gt; e ou <br>
+```
+
+### IO<br>
+```
+leia (&lt;array-of-vars&gt;) <br>
+escreva (&lt;array-of-vars&gt;) <br>
+```
+
+###IF structure <br>
+```
+se &lt;express&atilde;o-l&oacute;gica&gt; entao <br>
+&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
+senao <br>
+&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
+fimse <br>
+```
+
+### LOOP strucutre <br>
+```
+para &lt;vari&aacute;vel&gt; de &lt;valor-inicial&gt; ate &lt;valor-limite&gt; [passo &lt;incremento&gt;] faca <br>
+&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
+fimpara <br>
+```
+```
+enquanto &lt;express&atilde;o-l&oacute;gica&gt; faca <br>
+&lt;sequ&ecirc;ncia-de-comandos&gt; <br> 
+fimenquanto <br>
+```
+
+### Attribution <br> 
+```
+vari&aacute;vel &lt;- valor <br> 
+vari&aacute;vel &lt;- vari&aacute;vel <br>
+vari&aacute;vel &lt;- express&atilde;o <br>
+ ```
+ 
+### Basic structure that requires to follow to works <br>
+```
+algoritmo &quot;semnome&quot; <br>
+// Fun&ccedil;&atilde;o : <br>
+// Autor : <br>
+// Data : <br> 
+// Se&ccedil;&atilde;o de Declara&ccedil;&otilde;es <br>
+inicio <br> 
+// Se&ccedil;&atilde;o de Comandos <br>
+fimalgoritmo <br>
+```
+
+
+```
+algoritmo &quot;salario&quot; <br>
+// Se&ccedil;&atilde;o de Declara&ccedil;&otilde;es <br>
+var sal:inteiro <br>
+i,contador:inteiro <br>
+
+inicio <br>
+// Se&ccedil;&atilde;o de Comando <br>
+i&lt;-0; <br>
+contador&lt;-0; <br>
+para i de 1 ate 5 passo 1 faca <br>
+   escreva(&quot;Digite o salario do funcion&aacute;rio &quot;,i, &quot;: &quot;) <br>
+   leia (sal) <br>
+   se sal&gt;500 entao <br>
+      contador&lt;-contador+1 <br>
+   fimse <br>
+fimpara <br>
+escreval(contador, &quot; Funcion&aacute;rios recebem sal&aacute;rios superiores a R$ 300&quot; ) <br>
+fimalgoritmo  <br>
+```
