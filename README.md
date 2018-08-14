@@ -16,12 +16,15 @@ Below are the structures that contains on the code.<br>
 #### LEXIC SPECIFICATION<br>
 
 Type:<br>
-inteiro: intenger that not contains float numbers. Example: 0,1,2,3,4..<br>
-logico: boolean value TRUE or FALSE.<br>
-
+```
+inteiro: intenger that not contains float numbers. Example: 0,1,2,3,4..
+logico: boolean value TRUE or FALSE.
+```
 
 Declaration of variables<br>
-&lt;array-of-vars&gt; : &lt;type&gt; <br>
+```
+<array-of-vars> : <type>
+```
 In &lt;array-of-vars&gt;, the vars are separated by comas (,). <br>
 
 
