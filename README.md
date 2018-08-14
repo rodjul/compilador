@@ -64,13 +64,13 @@ fimalgoritmo
 
 
 <code>
-﻿algoritmo "salario"
+algoritmo "salario"
 // Seção de Declarações
 var sal:inteiro
 i,contador:inteiro
 
 inicio
-// Seção de Comandos
+// Seção de Comando
 i<-0;
 contador<-0;
 para i de 1 ate 5 passo 1 faca
