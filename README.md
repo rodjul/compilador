@@ -41,7 +41,7 @@ leia (<array-of-vars>)
 escreva (<array-of-vars>)
 ```
 
-###IF structure <br>
+### IF structure <br>
 ```
 se <expressão-lógica> entao
 <sequência-de-comandos>
