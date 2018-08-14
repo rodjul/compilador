@@ -9,6 +9,7 @@ Rodrigo Juliano M
 #include <string.h>
 
 int errosSintaticos=0;
+int errosSemanticos=0;
 int position = 0;
 int lines=0;
 
@@ -16,12 +17,34 @@ char file_saida[21] = "saida_sintatica.txt";
 char file_entrada[21] = "sintatico_entrada.txt";
 
 
+
+struct Tabela{
+	char * cadeia; // exemplo id,2
+	char * token; // id
+	char * categoria; //var, for, etc
+	char * tipo; //logico inteiro
+	char * valor; //0-9, verdadeiro, falso	
+};
+
+int qtdeSimbolosTabela = 15;
+int qtdeSimbolosTabelaInteiro=0;
+int qtdeSimbolosTabelaLogico=0;
+struct Tabela *tabelaInteiro[15];
+struct Tabela *tabelaLogico[15];
+
+
+
 struct arrayString{
 	char *string;
 };
 
+
+void insereTabelaVirgulas(int posicoesAteEncontrar, struct arrayString *buffer);
+void insereTabelaSimbolo(char *cadeia, char *token, char *categoria, char *tipo, char *valor);
+
 int isReservada(char *buffer, char *charWanted);
 int isTipoReservada(char *buffer);
+int isBooleana(char *string);
 int isVariable(char *string);
 int isAtribuicao(char *string);
 int isNumber(char *string);
@@ -35,7 +58,7 @@ int verificaSecaoComandos(struct arrayString *buffer, int mode);
 int verificaExpLogica(struct arrayString *buffer);
 int sintaxeSe(struct arrayString *buffer);
 int isRelOp(char *string);
-
+int verifyType(char *buffer, char *typeExpected);
 
 /*funcoes de auxilio */
 char * returnSecondWord(char *string);
@@ -80,12 +103,24 @@ int main(){
 	for(; line<lines; line++)
 		stxRemoveCharsFromFile(buffer[line]); //remove < > \n do arquivo para facilitar o processo
 	
+	int qtdTabela=0;
+	for(; qtdTabela<qtdeSimbolosTabela; qtdTabela++){
+		tabelaInteiro[qtdTabela] = (struct Tabela *) calloc(15, sizeof(struct Tabela));
+		tabelaLogico[qtdTabela] = (struct Tabela *) calloc(15, sizeof(struct Tabela));	
+	}
+	
+
 	startParser(buffer);
 	
 	if(errosSintaticos==0)
-		writeTokenFile("Analise sintatica sem erros",2,"NULL");
-		
+		writeTokenFile("Analise sintatica sem erros",3,"NULL");
+	if(errosSemanticos==0)
+		writeTokenFile("Analise semantica sem erros",3,"NULL");
 	
+	for(qtdTabela=0; qtdTabela<qtdeSimbolosTabela; qtdTabela++){
+		free(tabelaInteiro[qtdTabela]);
+		free(tabelaLogico[qtdTabela]);
+	}		
 	
 	for(line=0; line<lines;line++)
 		free(buffer[line].string);
@@ -94,7 +129,70 @@ int main(){
 	return 0;
 }
 
+/*
+posicoesAteEncontrar -> posicao do buffer ate encontrar um logico/inteiro, usado para encontrar em impares o tipo (ultimo valor) e os IDs
+*/
+void insereTabelaVirgulas(int posicoesAteEncontrar, struct arrayString *buffer){
+	int i=1;
+	char *tipo = buffer[position-i].string;
+	i++;
+	while(i<=posicoesAteEncontrar){
+		if( (i % 2) == 1){
+			insereTabelaSimbolo(buffer[position-i].string, "id" , "var", tipo, "-");
+		}
+		i++;
+	}
+	
+}
+void insereTabelaSimbolo(char *cadeia, char *token, char *categoria, char *tipo, char *valor){
+	if(strcmp(tipo,"inteiro")==0){
+		
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->cadeia = (char*) calloc(20, sizeof(char));
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->token = (char*) calloc(20, sizeof(char));
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->categoria = (char*) calloc(20, sizeof(char));
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->tipo = (char*) calloc(20, sizeof(char));
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->valor = (char*) calloc(20, sizeof(char));
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->cadeia = cadeia;
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->token = token;
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->categoria = categoria;
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->tipo = tipo;
+		tabelaInteiro[qtdeSimbolosTabelaInteiro]->valor = valor;
+		qtdeSimbolosTabelaInteiro++;
+		
+	}else{
+		
+		tabelaLogico[qtdeSimbolosTabelaLogico]->cadeia = (char*) calloc(20, sizeof(char));
+		tabelaLogico[qtdeSimbolosTabelaLogico]->token = (char*) calloc(20, sizeof(char));
+		tabelaLogico[qtdeSimbolosTabelaLogico]->categoria = (char*) calloc(20, sizeof(char));
+		tabelaLogico[qtdeSimbolosTabelaLogico]->tipo = (char*) calloc(20, sizeof(char));
+		tabelaLogico[qtdeSimbolosTabelaLogico]->valor = (char*) calloc(20, sizeof(char));
+		tabelaLogico[qtdeSimbolosTabelaLogico]->cadeia = cadeia;
+		tabelaLogico[qtdeSimbolosTabelaLogico]->token = token;
+		tabelaLogico[qtdeSimbolosTabelaLogico]->categoria = categoria;
+		tabelaLogico[qtdeSimbolosTabelaLogico]->tipo = tipo;
+		tabelaLogico[qtdeSimbolosTabelaLogico]->valor = valor;
+		qtdeSimbolosTabelaLogico++;
+		
+	}
+}
 
+
+void updateValor(char *id, char *valor){
+	int i=0;
+	for(;i < qtdeSimbolosTabelaInteiro; i++){
+		if(strcmp(tabelaInteiro[i]->cadeia,id) == 0){
+			tabelaInteiro[i]->valor = valor;
+			return;
+		}
+	}
+	i=0;
+	for(;i < qtdeSimbolosTabelaLogico; i++){
+		if(strcmp(tabelaLogico[i]->cadeia,id) == 0){
+			tabelaLogico[i]->valor = valor;
+			return;
+		}
+	}
+}
 
 
 void startParser(struct arrayString *buffer){
@@ -131,6 +229,7 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 			startWithVar =1;
 			//verifica se possui a estrutura correta ": inteiro"
 			if(isVariable(buffer[position].string )){
+				char *tempID = buffer[position-1].string;
 				
 				notVariable:
 				
@@ -140,6 +239,8 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 					if (! (isTipoReservada( buffer[position].string ))) {
 						writeTokenFile(buffer[position].string,1,"MOTIVO: declaracao de Tipo nao reservada");
 						errosSintaticos++;			
+					}else{
+						insereTabelaSimbolo(tempID, "id","var", buffer[position-1].string, "-");
 					}
 					
 					
@@ -166,14 +267,20 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 		
 			isVir =0; isPontuacaoVerified=0;
 			//verifica i,asdsa,dasdsa,dasdas : inteiro
+			int posicoesAteEncontrar=0;
 			while(1){
 				if(isVariable(buffer[position].string )){ //verifica se eh variavel
+					posicoesAteEncontrar++;
 					if(isPontuacao(buffer[position].string, "VIR")){ //virgula
+						posicoesAteEncontrar++;
 						isVir=1;
 					}else if( isVir && isPontuacao( buffer[position].string, "DOISPT")){ //se n encontrou virgula, verifica se eh :
+						posicoesAteEncontrar++;
 						isPontuacaoVerified=1;
 						//se apos o : nao for logico ou inteiro, erro lexico
 						if(isTipoReservada( buffer[position].string ) ){ //se encontrou : , verifica se eh logico/inteiro
+							posicoesAteEncontrar++;
+							insereTabelaVirgulas(posicoesAteEncontrar, buffer);
 							break; //para o while
 							
 						}else{ //se n encontrou, erro sintatico
@@ -181,9 +288,12 @@ void verificaSecaoDeclaracao(struct arrayString *buffer){
 						}
 						
 					}else if( !isVir && isPontuacao( buffer[position].string, "DOISPT")){ //se n encontrou virgula, verifica se eh :
+						posicoesAteEncontrar++;
 						isPontuacaoVerified=1;
 						//se apos o : nao for logico ou inteiro, erro lexico
 						if(isTipoReservada( buffer[position].string ) ){ //se encontrou : , verifica se eh logico/inteiro
+							posicoesAteEncontrar++;
+							insereTabelaVirgulas(posicoesAteEncontrar, buffer);
 							break; //para o while
 							
 						}else{ //se n encontrou, erro sintatico
@@ -270,19 +380,111 @@ int verificaSecaoComandos(struct arrayString *buffer, int mode){
 					sintaxeFuncaoIO(buffer);
 		
 		}else if(isVariable(buffer[position].string)){
+			char *temp = buffer[position-1].string;
 			if(isAtribuicao(buffer[position].string)){
-				if(isVariable(buffer[position].string) || isNumber(buffer[position].string)) {
-					if(isOperador(buffer[position].string)){
-						if(isVariable(buffer[position].string) || isNumber(buffer[position].string))
+				
+				if(verifyType(temp,"inteiro")){
+				
+					if(isBooleana(buffer[position].string)){
+						errosSemanticos++;
+						writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+						writeTokenFile(temp,2,"MOTIVO: variavel do tipo inteiro, mas declarada como Booleana");
+						goto foundBool;
+					}
+					
+					if(isNumber(buffer[position].string )  ||  (verifyType(buffer[position].string,"inteiro") && isVariable(buffer[position].string) ))   {
+						if(verifyType(buffer[position-1].string,"logico")){
+							errosSemanticos++;
+							writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+							writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");
+						}
+						foundBool:
+						if(isOperador(buffer[position].string)){
+							if( isNumber(buffer[position].string) || (verifyType(buffer[position].string, "inteiro" )  && isVariable(buffer[position].string) ) ){
+								if(verifyType(buffer[position-1].string,"logico")){
+									errosSemanticos++;
+									writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+									writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");
+								}
+								//updateValor()
+								goto loop;
+							}
+						}else if(isPontuacao(buffer[position].string,"PTVIR")){
 							goto loop;
-					}else if(isPontuacao(buffer[position].string,"PTVIR")){
-						goto loop;
-					}else
-						goto loop;
+						}else
+							goto loop;
+					}else{
+						writeTokenFile(buffer[position].string,1,"MOTIVO: falta Numero ou Variavel");
+						errosSintaticos++;
+					}
+				
+				}else if(verifyType(temp,"logico")){
+					
+					if(  isNumber(buffer[position].string )){
+						errosSemanticos++;
+						writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+						writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");
+						goto achouNumero;
+					}
+					if( isVariable(buffer[position].string) )   {
+						achouNumero:
+						if(isOperador(buffer[position].string)){
+							errosSemanticos++;
+							writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+							writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");					
+							
+							if( isNumber(buffer[position].string) || (verifyType(buffer[position].string, "inteiro" )  && isVariable(buffer[position].string) ) ){
+								//updateValor()
+								goto loop;
+							}
+						}else if(isPontuacao(buffer[position].string,"PTVIR")){
+							goto loop;
+						}else
+							goto loop;
+							
+					}else if(isBooleana(buffer[position].string)){
+						
+						if(isOperador(buffer[position].string)){
+							errosSemanticos++;
+							writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+							writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");					
+							
+							if( isNumber(buffer[position].string) || (verifyType(buffer[position].string, "inteiro" )  && isVariable(buffer[position].string) ) ){
+								errosSemanticos++;
+								writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+								writeTokenFile(temp,2,"MOTIVO: variavel eh do tipo logico");
+								goto loop;
+							}
+						}else if(isPontuacao(buffer[position].string,"PTVIR")){
+							goto loop;
+						}else
+							goto loop;
+					}else{
+						writeTokenFile(buffer[position].string,1,"MOTIVO: falta Numero ou Variavel");
+						errosSintaticos++;
+					}
+				
 				}else{
-					writeTokenFile(buffer[position].string,1,"MOTIVO: falta Numero ou Variavel");
-					errosSintaticos++;
+					errosSemanticos++;
+					writeTokenFile(buffer[position].string,1,"MOTIVO: erro semantico");
+					writeTokenFile(temp,2,"MOTIVO: variavel nao instanciada");
+					
+					if(isNumber(buffer[position].string )  ||  (isVariable(buffer[position].string) ))   {
+						if(isOperador(buffer[position].string)){
+							if( isNumber(buffer[position].string) || (isVariable(buffer[position].string) ) ){
+								//updateValor()
+								goto loop;
+							}
+						}else if(isPontuacao(buffer[position].string,"PTVIR")){
+							goto loop;
+						}else
+							goto loop;
+					}else{
+						writeTokenFile(buffer[position].string,1,"MOTIVO: falta Numero ou Variavel");
+						errosSintaticos++;
+					}
 				}
+					
 			}
 			
 		}else if((strcmp( buffer[position].string, "fimse" ) == 0)
@@ -306,30 +508,61 @@ int verificaSecaoComandos(struct arrayString *buffer, int mode){
 	return 0;
 }
 
+
+int verifyType(char *buffer, char *typeExpected){
+	if(strcmp(typeExpected,"inteiro") == 0){
+		int i=0;
+		for(; i < qtdeSimbolosTabelaInteiro; i++){
+			if(strcmp(tabelaInteiro[i]->cadeia, buffer) == 0){
+				if(strcmp(tabelaInteiro[i]->tipo, "inteiro") == 0){
+					return 1;
+				}
+			}
+		}
+	}else if(strcmp(typeExpected,"logico")==0 ){
+		int i=0;
+		for(; i < qtdeSimbolosTabelaLogico; i++){
+			if(strcmp(tabelaLogico[i]->cadeia, buffer) == 0){
+				if(strcmp(tabelaLogico[i]->tipo, "logico") == 0){
+					return 1;
+				}
+			}
+		}		
+	}
+
+
+	return 0;
+}
+
 int verificaExpLogica(struct arrayString *buffer){
 	int boolean=0;
 	loop:
-	if(isVariable(buffer[position].string) || isNumber(buffer[position].string) ){
+	if(isNumber(buffer[position].string) || (isVariable(buffer[position].string)  ) ){
+		if(!isNumber(buffer[position-1].string)){
+			if(!verifyType(buffer[position-1].string,"inteiro")){
+				errosSemanticos++;
+				writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+				writeTokenFile(buffer[position-1].string,2,"MOTIVO: variavel eh do tipo logico");
+			}
+		}else{
+			position--;
+		}
 		boolean = 1;
 		
 		if(isRelOp(buffer[position].string)){
 			boolean = 0;
 			goto loop;
-			//if(isVariable(buffer[position].string) || isNumber(buffer[position].string) )
-			//else{
-				//printf("ERRO LEXICO %s\n", buffer[position].string);
-			//}
 		}else if(strcmp(buffer[position].string,"entao") == 0){
 			return boolean;
 		}
 		else{
-			writeTokenFile(buffer[position].string,1,"MOTIVO: falta variavel em ExpLOgica");
+			writeTokenFile(buffer[position].string,1,"MOTIVO: falta variavel em ExpLogica");
 			errosSintaticos++;
 			goto loop;
 		}
 	}
 	if(!boolean){
-		writeTokenFile(buffer[position].string,1,"MOTIVO: falta variavel em ExpLOgica");
+		writeTokenFile(buffer[position].string,1,"MOTIVO: falta variavel em ExpLogica");
 		errosSintaticos++;
 	}
 	return boolean;
@@ -378,6 +611,20 @@ int isReservada(char *string, char *charWanted){
 	return boolean;
 }
 
+int isBooleana(char *string){
+	int boolean=0;
+	
+	if(strcmp( string, "VERDADEIRO" ) == 0) boolean = 1;
+	else if(strcmp( string, "FALSO" ) == 0) boolean = 1;
+
+	if(boolean){
+		position++;
+		//writeTokenFile(string,0);
+	} 
+	
+	return boolean;
+}
+
 int isTipoReservada(char *string){
 	int boolean=0;
 	
@@ -411,11 +658,6 @@ int isVariable(char *string){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
-	}else{
-		//errosSintaticos++;
-		//boolean=1;
-		//writeTokenFile(string,1,"MOTIVO: falta variavel");
 	}
 	return boolean;
 }
@@ -435,7 +677,6 @@ int isAtribuicao(char *string){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
 	}else{
 		boolean=1;
 		errosSintaticos++;
@@ -472,11 +713,7 @@ int isRelOp(char *string){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
-	}else{
-		//errosSintaticos++;
-		//writeTokenFile(string,1);
-		//boolean=1;
+		
 	}
 	return boolean;
 }
@@ -496,11 +733,6 @@ int isNumber(char *string){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
-	}else{
-		//errosSintaticos++;
-		//writeTokenFile(string,1);
-		//boolean=1;
 	}
 	return boolean;
 }
@@ -524,12 +756,6 @@ int isPontuacao(char *string, char *pontuacao){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
-	}else{
-		//errosSintaticos++;
-		//position++;
-		//writeTokenFile(string,1);
-		//boolean=1;
 	}
 	
 	return boolean;
@@ -558,11 +784,7 @@ int isOperador(char *string){
 	}
 	if(boolean){
 		position++;
-		//writeTokenFile(string,0);
-	}else{
-		//errosSintaticos++;
-		//writeTokenFile(string,1);
-		//boolean=1;
+		
 	}
 	
 	return boolean;
@@ -607,9 +829,6 @@ int sintaxeFuncaoIO(struct arrayString *buffer){
 					break;	
 
 				}else{
-					/*writeTokenFile(buffer[position].string,1);	
-					errosSintaticos++;
-					position++;*/
 					goto verifyAgainNumber;
 				}
 			}
@@ -620,35 +839,7 @@ int sintaxeFuncaoIO(struct arrayString *buffer){
 			goto verifyAgain;
 		}
 		
-	}/*else if( strcmp(strFuncao, "leia") == 0){
-		printf("<%s>\n",buffer[position].string);
-		position++;
-		if(isPontuacao(buffer[position].string, "PA" )
-				&& isVariable(buffer[position].string)
-				&& isPontuacao(buffer[position].string, "PF" ))
-				boolean = 1;
-					
-
-	}else if( strcmp(strFuncao, "leia") == 0 ){
-		printf("<%s>\n",buffer[position].string);
-		position++;
-		if(isPontuacao(buffer[position].string, "PA" )
-				&& isVariable(buffer[position].string)
-				&& isPontuacao(buffer[position].string, "PF" ))
-				boolean = 1;
-
-	}else if( strcmp(strFuncao, "mod") == 0 ){
-		printf("<%s>\n",buffer[position].string);
-		position++;
-		if(isPontuacao(buffer[position].string, "PA" )
-				&& isVariable(buffer[position].string)
-				&& isPontuacao(buffer[position].string, "PF" ))
-				boolean = 1;
 	}
-	
-	/*if(boolean){
-		printf("%s\n",buffer[position-1].string);
-	}*/
 	
 	return boolean;
 }
@@ -680,13 +871,7 @@ int sintaxeSe(struct arrayString *buffer){
 			}
 		}		
 		
-	}/*else{
-		writeTokenFile(buffer[position].string,1,"MOTIVO: Falta sintaxe  no Para");
-		errosSintaticos++;
-		goto notVar;
-	}*/
-	
-	
+	}
 	 
 }
 
@@ -696,6 +881,12 @@ int sintaxeFor(struct arrayString *buffer){
 		
 		if(isVariable(buffer[position].string)){
 			notVar:
+			
+			if(!verifyType(buffer[position-1].string, "inteiro") ){
+				writeTokenFile(buffer[position-1].string,1,"MOTIVO: erro semantico");
+				writeTokenFile(buffer[position-1].string,2,"MOTIVO: variavel precisa ser do tipo inteiro");
+			}	
+				
 			if(isReservada(buffer[position].string,"de")){
 				notDe:
 				if(isNumber(buffer[position].string) ){
@@ -814,12 +1005,13 @@ void removeChar(char *str, char garbage) {
     *dst = '\0';
 }
 
+int firstTime=0;
 void writeTokenFile(char *string, int erro, char *stringMotivo){
 	FILE *file;
 
 	char *output = (char*)calloc(strlen(string)+strlen(stringMotivo)+60, sizeof(char) );
 	if(erro == 1){
-		strcpy(output,"ERRO LEXICO: ");
+		strcpy(output,"ERRO SINTATICO: ");
 		strcat(output, "<");
 		strcat(output,string);
 		strcat(output, ">");
@@ -838,10 +1030,22 @@ void writeTokenFile(char *string, int erro, char *stringMotivo){
 		strcat(output, ">");
 		strcat(output, "\n");
 	}else if(erro==2){
+		strcpy(output,"ERRO SEMANTICO: <");
+		strcat(output,string);
+		strcat(output,"> ");
+		strcat(output,stringMotivo);
+		strcat(output,"\n");
+	}else if(erro==3){ //print messsage only
 		strcpy(output,string);
+		strcat(output,"\n");
 	}
 	printf("%s",output);
-	file = fopen(file_saida,"a"); //a = se n existe, cria o arquivo e append os strings
+	if(!firstTime){
+		file = fopen(file_saida,"w"); //"limpa" o arquivo se existir 
+		firstTime++;	
+	}else{
+		file = fopen(file_saida,"a"); //append
+	}
 	fprintf(file,output);
 	free(output);
 	fclose(file);
