@@ -27,75 +27,75 @@ In &lt;array-of-vars&gt;, the vars are separated by comas (,). <br>
 
 ### Operations<br>
 ```
-+ - * \ mod  <br>
-&gt; &gt;= &lt; &lt;= exp  <br>
-= &lt;&gt; e ou <br>
++ - * \ mod 
+> >= < <= exp 
+= <> e ou
 ```
 
 ### IO<br>
 ```
-leia (&lt;array-of-vars&gt;) <br>
-escreva (&lt;array-of-vars&gt;) <br>
+leia (<array-of-vars>)
+escreva (<array-of-vars>)
 ```
 
 ###IF structure <br>
 ```
-se &lt;express&atilde;o-l&oacute;gica&gt; entao <br>
-&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
-senao <br>
-&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
-fimse <br>
+se <expressão-lógica> entao
+<sequência-de-comandos>
+senao
+<sequência-de-comandos>
+fimse
 ```
 
 ### LOOP strucutre <br>
 ```
-para &lt;vari&aacute;vel&gt; de &lt;valor-inicial&gt; ate &lt;valor-limite&gt; [passo &lt;incremento&gt;] faca <br>
-&lt;sequ&ecirc;ncia-de-comandos&gt; <br>
-fimpara <br>
+para <variável> de <valor-inicial> ate <valor-limite> [passo <incremento>] faca
+<sequência-de-comandos>
+fimpara
 ```
 ```
-enquanto &lt;express&atilde;o-l&oacute;gica&gt; faca <br>
-&lt;sequ&ecirc;ncia-de-comandos&gt; <br> 
-fimenquanto <br>
+enquanto <expressão-lógica> faca
+<sequência-de-comandos>
+fimenquanto
 ```
 
 ### Attribution <br> 
 ```
-vari&aacute;vel &lt;- valor <br> 
-vari&aacute;vel &lt;- vari&aacute;vel <br>
-vari&aacute;vel &lt;- express&atilde;o <br>
+variável <- valor
+variável <- variável
+variável <- expressão
  ```
  
 ### Basic structure that requires to follow to works <br>
 ```
-algoritmo &quot;semnome&quot; <br>
-// Fun&ccedil;&atilde;o : <br>
-// Autor : <br>
-// Data : <br> 
-// Se&ccedil;&atilde;o de Declara&ccedil;&otilde;es <br>
-inicio <br> 
-// Se&ccedil;&atilde;o de Comandos <br>
-fimalgoritmo <br>
+algoritmo "semnome"
+// Função :
+// Autor :
+// Data :
+// Seção de Declarações
+inicio
+// Seção de Comandos
+fimalgoritmo
 ```
 
-
+### Example of input.txt
 ```
-algoritmo &quot;salario&quot; <br>
-// Se&ccedil;&atilde;o de Declara&ccedil;&otilde;es <br>
-var sal:inteiro <br>
-i,contador:inteiro <br>
+algoritmo "salario"
+// Seção de Declarações
+var sal:inteiro
+i,contador:inteiro
 
-inicio <br>
-// Se&ccedil;&atilde;o de Comando <br>
-i&lt;-0; <br>
-contador&lt;-0; <br>
-para i de 1 ate 5 passo 1 faca <br>
-   escreva(&quot;Digite o salario do funcion&aacute;rio &quot;,i, &quot;: &quot;) <br>
-   leia (sal) <br>
-   se sal&gt;500 entao <br>
-      contador&lt;-contador+1 <br>
-   fimse <br>
-fimpara <br>
-escreval(contador, &quot; Funcion&aacute;rios recebem sal&aacute;rios superiores a R$ 300&quot; ) <br>
-fimalgoritmo  <br>
+inicio
+// Seção de Comando
+i<-0;
+contador<-0;
+para i de 1 ate 5 passo 1 faca
+   escreva("Digite o salario do funcionário ",i, ": ")
+   leia (sal)
+   se sal>500 entao
+      contador<-contador+1
+   fimse
+fimpara
+escreval(contador, " Funcionários recebem salários superiores a R$ 300" )
+fimalgoritmo
 ```
